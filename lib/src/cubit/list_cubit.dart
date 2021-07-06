@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
@@ -9,10 +11,15 @@ class ListCubit extends Cubit<ListState> {
   ListCubit() : super(ListInitial());
 
   Future<void> fetchItems() async {
+    var status = ["GREEN", "YELLOW", "RED"];
 
-    List<ObjectPark> objectParkItems = List.generate(10, (index) => ObjectPark('Park$index','Status$index','https://picsum.photos/500/300/?Image=$index'));
+    List<ObjectPark> objectParkItems = List.generate(10, (index) {
+      var state = status[Random().nextInt(3)];
+      print("$index $state");
+      return ObjectPark(
+          'Park$index', state, 'https://picsum.photos/500/300/?Image=$index');
+    });
     await Future.delayed(const Duration(seconds: 2));
     emit(ListLoadedState(objectParkItems));
   }
-
 }
