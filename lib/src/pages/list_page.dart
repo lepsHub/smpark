@@ -16,7 +16,6 @@ class ListPage extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: SafeArea(
             child: Column(
-              crossAxisAlignment:,
               children: [
                 Row(
                   children: [
@@ -42,14 +41,27 @@ class ListPage extends StatelessWidget {
                             return AspectRatio(
                               aspectRatio: 3 / 1,
                               child: Container(
-                                child: Stack(
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(color: Colors.white)),
+                                child: Stack(              
+                                  clipBehavior: Clip.antiAlias,
+                                  fit: StackFit.expand,
                                   children: [
                                     ClipRRect(
-                                        borderRadius: BorderRadius.circular(10),
-                                        clipBehavior: Clip.antiAlias,
-                                        child: Image(
-                                            image:
-                                                NetworkImage(item.streeImage)))
+                                      borderRadius: BorderRadius.circular(10),
+                                      clipBehavior: Clip.antiAlias,
+                                      child: Image(
+                                          fit: BoxFit.cover,
+                                          image: NetworkImage(item.streeImage)),
+                                    ),
+                                    Positioned(
+                                      bottom: 10,
+                                      left: 10,          
+                                      child: Text(item.streetName,style: Theme.of(context).textTheme.headline6?.copyWith(
+                                        color: Colors.blueGrey[200]
+                                      ))
+                                    ),
                                   ],
                                 ),
                               ),
