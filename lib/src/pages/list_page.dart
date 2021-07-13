@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:smpark/src/cubit/list_cubit.dart';
+import 'package:smpark/src/pages/detail_page.dart';
 import 'package:smpark/src/providers/list_provider.dart';
 
 class ListPage extends StatefulWidget {
@@ -66,43 +67,50 @@ class _ListPageState extends State<ListPage> {
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(10),
                                       border: Border.all(color: Colors.white)),
-                                  child: Stack(
-                                    alignment: Alignment.centerRight,
-                                    clipBehavior: Clip.antiAlias,
-                                    fit: StackFit.expand,
-                                    children: [
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(10),
-                                        clipBehavior: Clip.antiAlias,
-                                        child: Image(
-                                            fit: BoxFit.cover,
-                                            image:
-                                                NetworkImage(item.streeImage)),
-                                      ),
-                                      Positioned(
-                                          bottom: 10,
-                                          left: 10,
-                                          child: Text(item.streetName,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .headline6
-                                                  ?.copyWith(
-                                                      color: Colors
-                                                          .blueGrey[200]))),
-                                      Positioned(
-                                          width: 30,
-                                          height: 30,
-                                          right: 15,
-                                          child:
-                                              ValueListenableBuilder<List<int>>(
-                                                  valueListenable:
-                                                      _visibilityRange,
-                                                  builder: (_, snapshot, __) =>
-                                                      _ParkDotState(
-                                                          item.streetStatus,
-                                                          position,
-                                                          snapshot)))
-                                    ],
+                                  child: InkWell(
+                                    onTap: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (_) => DetailPage())),
+                                    child: Stack(
+                                      alignment: Alignment.centerRight,
+                                      clipBehavior: Clip.antiAlias,
+                                      fit: StackFit.expand,
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          clipBehavior: Clip.antiAlias,
+                                          child: Image(
+                                              fit: BoxFit.cover,
+                                              image: NetworkImage(
+                                                  item.streeImage)),
+                                        ),
+                                        Positioned(
+                                            bottom: 10,
+                                            left: 10,
+                                            child: Text(item.streetName,
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .headline6
+                                                    ?.copyWith(
+                                                        color: Colors
+                                                            .blueGrey[200]))),
+                                        Positioned(
+                                            width: 30,
+                                            height: 30,
+                                            right: 15,
+                                            child: ValueListenableBuilder<
+                                                    List<int>>(
+                                                valueListenable:
+                                                    _visibilityRange,
+                                                builder: (_, snapshot, __) =>
+                                                    _ParkDotState(
+                                                        item.streetStatus,
+                                                        position,
+                                                        snapshot)))
+                                      ],
+                                    ),
                                   ),
                                 ),
                               );
