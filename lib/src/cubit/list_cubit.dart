@@ -17,7 +17,11 @@ class ListCubit extends Cubit<ListState> {
       var state = status[Random().nextInt(3)];
       print("$index $state");
       return ObjectPark(
-          'Park$index', state, 'https://picsum.photos/500/300/?Image=$index');
+          'Park$index',
+          state,
+          'https://picsum.photos/500/300/?Image=$index',
+          List.generate(
+              6, (index) => 'https://picsum.photos/500/300/?Image=$index'));
     });
     await Future.delayed(const Duration(seconds: 2));
     emit(ListLoadedState(objectParkItems));

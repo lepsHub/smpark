@@ -71,7 +71,7 @@ class _ListPageState extends State<ListPage> {
                                     onTap: () => Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (_) => DetailPage())),
+                                            builder: (_) => DetailPage(item))),
                                     child: Stack(
                                       alignment: Alignment.centerRight,
                                       clipBehavior: Clip.antiAlias,
