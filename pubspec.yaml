@@ -26,6 +26,8 @@ dependencies:
   flutter_bloc: ^7.0.1
   equatable: ^2.0.3
 
+  url_launcher: ^6.0.9
+  location: ^4.3.0
 
   flutter_localizations:
     sdk: flutter

@@ -21,7 +21,9 @@ class ListCubit extends Cubit<ListState> {
           state,
           'https://picsum.photos/500/300/?Image=$index',
           List.generate(
-              6, (index) => 'https://picsum.photos/500/300/?Image=$index'));
+              6, (index) => 'https://picsum.photos/500/300/?Image=$index'),
+          -12.175029073735226,
+          -77.01284083757179);
     });
     await Future.delayed(const Duration(seconds: 2));
     emit(ListLoadedState(objectParkItems));
