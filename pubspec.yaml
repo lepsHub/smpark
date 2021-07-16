@@ -28,6 +28,7 @@ dependencies:
 
   url_launcher: ^6.0.9
   location: ^4.3.0
+  http: ^0.13.0
 
   flutter_localizations:
     sdk: flutter

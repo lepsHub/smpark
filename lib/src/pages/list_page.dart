@@ -25,6 +25,9 @@ class _ListPageState extends State<ListPage> {
 
   @override
   Widget build(BuildContext context) {
+    Widget addressAutoCompleteWidget = SizedBox(width: 0, height: 0);
+    Widget ListWidget = Center(child: CircularProgressIndicator());
+
     return BlocProvider(
       create: (context) => ListCubit()..fetchItems(),
       child: Scaffold(
@@ -35,7 +38,7 @@ class _ListPageState extends State<ListPage> {
               children: [
                 Row(
                   children: [
-                    Icon(CupertinoIcons.location_solid),
+                    Icon(CupertinoIcons.location_solid, size: 30),
                     Expanded(
                       child: TextField(
                         decoration: InputDecoration(
@@ -47,83 +50,139 @@ class _ListPageState extends State<ListPage> {
                   ],
                 ),
                 const SizedBox(width: 0, height: 10),
-                BlocBuilder<ListCubit, ListState>(
-                  builder: (context, state) {
-                    if (state is ListLoadedState) {
-                      return Expanded(
-                        child: NotificationListener(
-                          onNotification: (not) {
-                            if (not is ScrollEndNotification)
-                              _resetDotAnimations();
-                            return true;
-                          },
-                          child: ListView.separated(
-                            controller: _scrollController,
-                            itemBuilder: (_, position) {
-                              ObjectPark item = state.items[position];
-                              return AspectRatio(
-                                aspectRatio: 3 / 1,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      border: Border.all(color: Colors.white)),
-                                  child: InkWell(
-                                    onTap: () => Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (_) => DetailPage(item))),
-                                    child: Stack(
-                                      alignment: Alignment.centerRight,
-                                      clipBehavior: Clip.antiAlias,
-                                      fit: StackFit.expand,
-                                      children: [
-                                        ClipRRect(
+                Stack(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 30),
+                      child: BlocBuilder<ListCubit, ListState>(
+                        builder: (context, state) {
+                          if (state is AddressLoadedState)
+                            addressAutoCompleteWidget = ListView.builder(
+                              itemBuilder: (_, position) {
+                                return ListTile(
+                                  title: Text("data"),
+                                );
+                              },
+                              itemCount: state.hashCode,
+                            );
+                          else if (state is ListLoadedState)
+                            addressAutoCompleteWidget =
+                                SizedBox(width: 0, height: 0);
+                          return addressAutoCompleteWidget;
+                        },
+                      ),
+                    ),
+                    BlocBuilder<ListCubit, ListState>(
+                      builder: (context, state) {
+                        if (state is ListErrorState)
+                          return Center(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text("Ocurrio un error"),
+                                const SizedBox(height: 6, width: 0),
+                                Text(
+                                  "Revisa que tu GPS este activo y brindanos permisos",
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 6, width: 0),
+                                ElevatedButton(
+                                  onPressed: () =>
+                                      context.read<ListCubit>().fetchItems(),
+                                  child: Text("Reintentar"),
+                                ),
+                              ],
+                            ),
+                          );
+                        if (state is ListLoadedState)
+                          ListWidget =
+                              Center(child: CircularProgressIndicator());
+                        else if (state is ListLoadedState) {
+                          ListWidget = Expanded(
+                            child: NotificationListener(
+                              onNotification: (not) {
+                                if (not is ScrollEndNotification)
+                                  _resetDotAnimations();
+                                return true;
+                              },
+                              child: ListView.separated(
+                                controller: _scrollController,
+                                itemBuilder: (_, position) {
+                                  ObjectPark item = state.items[position];
+                                  return AspectRatio(
+                                    aspectRatio: 3 / 1,
+                                    child: Container(
+                                      decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(10),
+                                          border:
+                                              Border.all(color: Colors.white)),
+                                      child: InkWell(
+                                        onTap: () => Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (_) =>
+                                                    DetailPage(item))),
+                                        child: Stack(
+                                          alignment: Alignment.centerRight,
                                           clipBehavior: Clip.antiAlias,
-                                          child: Image(
-                                              fit: BoxFit.cover,
-                                              image: NetworkImage(
-                                                  item.streeImage)),
+                                          fit: StackFit.expand,
+                                          children: [
+                                            ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              clipBehavior: Clip.antiAlias,
+                                              child: Image(
+                                                  fit: BoxFit.cover,
+                                                  image:
+                                                      NetworkImage(item.foto)),
+                                            ),
+                                            Positioned(
+                                                bottom: 10,
+                                                left: 10,
+                                                child: Text(item.nombre,
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .headline6
+                                                        ?.copyWith(
+                                                            color:
+                                                                Colors.blueGrey[
+                                                                    200]))),
+                                            Positioned(
+                                                width: 30,
+                                                height: 30,
+                                                right: 15,
+                                                child: ValueListenableBuilder<
+                                                        List<int>>(
+                                                    valueListenable:
+                                                        _visibilityRange,
+                                                    builder: (_, snapshot,
+                                                            __) =>
+                                                        _ParkDotState(
+                                                            _calculateStatus(
+                                                                item.estado!
+                                                                    .total,
+                                                                item.estado!
+                                                                    .libres),
+                                                            position,
+                                                            snapshot)))
+                                          ],
                                         ),
-                                        Positioned(
-                                            bottom: 10,
-                                            left: 10,
-                                            child: Text(item.streetName,
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .headline6
-                                                    ?.copyWith(
-                                                        color: Colors
-                                                            .blueGrey[200]))),
-                                        Positioned(
-                                            width: 30,
-                                            height: 30,
-                                            right: 15,
-                                            child: ValueListenableBuilder<
-                                                    List<int>>(
-                                                valueListenable:
-                                                    _visibilityRange,
-                                                builder: (_, snapshot, __) =>
-                                                    _ParkDotState(
-                                                        item.streetStatus,
-                                                        position,
-                                                        snapshot)))
-                                      ],
+                                      ),
                                     ),
-                                  ),
-                                ),
-                              );
-                            },
-                            itemCount: state.items.length,
-                            separatorBuilder: (_, __) =>
-                                const SizedBox(width: 0, height: 10),
-                          ),
-                        ),
-                      );
-                    }
-                    return Center(child: CircularProgressIndicator());
-                  },
+                                  );
+                                },
+                                itemCount: state.items.length,
+                                separatorBuilder: (_, __) =>
+                                    const SizedBox(width: 0, height: 10),
+                              ),
+                            ),
+                          );
+                        }
+                        return ListWidget;
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -134,10 +193,21 @@ class _ListPageState extends State<ListPage> {
   }
 
   _resetDotAnimations() {}
+
+  StatusState _calculateStatus(int total, int free) {
+    if (free == total)
+      return StatusState.FULL;
+    else if (free >= total * .66)
+      return StatusState.ALMOST;
+    else if (free >= total * .33)
+      return StatusState.PARTIAL;
+    else
+      return StatusState.FREE;
+  }
 }
 
 class _ParkDotState extends StatefulWidget {
-  final String _parkState;
+  final StatusState _parkState;
   final int _position;
   final List<int> _range;
   _ParkDotState(this._parkState, this._position, this._range, {Key? key})
@@ -160,11 +230,13 @@ class __ParkDotStateState extends State<_ParkDotState>
 
   @override
   Widget build(BuildContext context) {
-    var dotColor = widget._parkState == "GREEN"
+    var dotColor = widget._parkState == StatusState.FREE
         ? Colors.green
-        : widget._parkState == "YELLOW"
+        : widget._parkState == StatusState.PARTIAL
             ? Colors.yellow
-            : Colors.red;
+            : widget._parkState == StatusState.ALMOST
+                ? Colors.orange
+                : Colors.red;
 
     return Stack(alignment: Alignment.center, children: [
       Container(
@@ -191,3 +263,5 @@ class __ParkDotStateState extends State<_ParkDotState>
     ]);
   }
 }
+
+enum StatusState { FULL, ALMOST, PARTIAL, FREE }

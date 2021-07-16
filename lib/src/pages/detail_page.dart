@@ -19,7 +19,7 @@ class DetailPage extends StatelessWidget {
             if (state is LocationLoadedState) {
               if (state.lat != null && state.long != null)
                 MapUtils.openMap(
-                    state.lat!, state.long!, _park.latitude, _park.longitude);
+                    state.lat!, state.long!, _park.latitud, _park.longitud);
               else
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     content:
@@ -48,12 +48,12 @@ class DetailPage extends StatelessWidget {
                                 clipBehavior: Clip.antiAlias,
                                 child: Image(
                                     fit: BoxFit.cover,
-                                    image: NetworkImage(_park.streeImage)),
+                                    image: NetworkImage(_park.foto)),
                               ),
                               Positioned(
                                   bottom: 10,
                                   left: 10,
-                                  child: Text(_park.streetName,
+                                  child: Text(_park.nombre,
                                       style: Theme.of(context)
                                           .textTheme
                                           .headline6
@@ -370,11 +370,12 @@ class DetailPage extends StatelessWidget {
                                   clipBehavior: Clip.antiAlias,
                                   child: Image(
                                       fit: BoxFit.cover,
-                                      image: NetworkImage(_park.poi[position])),
+                                      image: NetworkImage(
+                                          _park.puntosInteres[position].foto)),
                                 ),
                               );
                             },
-                            itemCount: _park.poi.length,
+                            itemCount: _park.puntosInteres.length,
                           ),
                         ),
                         Container(

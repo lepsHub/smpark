@@ -1,8 +1,12 @@
+import 'dart:html';
 import 'dart:math';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:location/location.dart';
 import 'package:meta/meta.dart';
+import 'package:smpark/api/service/service_service.dart';
+import 'package:smpark/api/service_api.dart';
 import 'package:smpark/src/providers/list_provider.dart';
 
 part 'list_state.dart';
@@ -11,21 +15,68 @@ class ListCubit extends Cubit<ListState> {
   ListCubit() : super(ListInitial());
 
   Future<void> fetchItems() async {
-    var status = ["GREEN", "YELLOW", "RED"];
-
+    /*
     List<ObjectPark> objectParkItems = List.generate(10, (index) {
-      var state = status[Random().nextInt(3)];
-      print("$index $state");
       return ObjectPark(
-          'Park$index',
-          state,
-          'https://picsum.photos/500/300/?Image=$index',
-          List.generate(
-              6, (index) => 'https://picsum.photos/500/300/?Image=$index'),
-          -12.175029073735226,
-          -77.01284083757179);
+        index,
+        "-12.175029073735226",
+        "-77.01284083757179",
+        "Park $index",
+        Estado(20, Random().nextInt(19)),
+        "Av Siempre Viva, Springfield",
+        'https://picsum.photos/500/300/?Image=$index',
+        Tarifa(15, 29),
+        Horario("L -V", "S - D"),
+        List.generate(
+            6,
+            (index) => PuntosInteres(
+                "Foto $index",
+                'https://picsum.photos/500/300/?Image=$index',
+                'https://picsum.photos/500/300/?Image=$index')),
+      );
     });
     await Future.delayed(const Duration(seconds: 2));
-    emit(ListLoadedState(objectParkItems));
+    */
+
+    emit(ListLoadingState());
+
+    Location location = new Location();
+
+    bool _serviceEnabled;
+    PermissionStatus _permissionGranted;
+
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
+        emit(ListErrorState());
+        return;
+      }
+    }
+
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted != PermissionStatus.granted) {
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        emit(ListErrorState());
+        return;
+      }
+    }
+
+    var locationData = await location.getLocation();
+    if (locationData.latitude == null || locationData.longitude == null) {
+      emit(ListErrorState());
+      return;
+    }
+
+    try {
+      var objectParkItems = await ServiceServiceImpl(ServiceAPI())
+          .findServiceByFilter(locationData.latitude!, locationData.longitude!);
+      emit(ListLoadedState(objectParkItems));
+    } catch (e) {
+      emit(ListErrorState());
+    }
   }
+
+  Future<void> searchAddress(String address) async {}
 }
