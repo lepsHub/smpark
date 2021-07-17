@@ -50,56 +50,57 @@ class _ListPageState extends State<ListPage> {
                   ],
                 ),
                 const SizedBox(width: 0, height: 10),
-                Stack(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 30),
-                      child: BlocBuilder<ListCubit, ListState>(
-                        builder: (context, state) {
-                          if (state is AddressLoadedState)
-                            addressAutoCompleteWidget = ListView.builder(
-                              itemBuilder: (_, position) {
-                                return ListTile(
-                                  title: Text("data"),
-                                );
-                              },
-                              itemCount: state.hashCode,
-                            );
-                          else if (state is ListLoadedState)
-                            addressAutoCompleteWidget =
-                                SizedBox(width: 0, height: 0);
-                          return addressAutoCompleteWidget;
-                        },
+                Expanded(
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 30),
+                        child: BlocBuilder<ListCubit, ListState>(
+                          builder: (context, state) {
+                            if (state is AddressLoadedState)
+                              addressAutoCompleteWidget = ListView.builder(
+                                itemBuilder: (_, position) {
+                                  return ListTile(
+                                    title: Text("data"),
+                                  );
+                                },
+                                itemCount: state.hashCode,
+                              );
+                            else if (state is ListLoadedState)
+                              addressAutoCompleteWidget =
+                                  SizedBox(width: 0, height: 0);
+                            return addressAutoCompleteWidget;
+                          },
+                        ),
                       ),
-                    ),
-                    BlocBuilder<ListCubit, ListState>(
-                      builder: (context, state) {
-                        if (state is ListErrorState)
-                          return Center(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text("Ocurrio un error"),
-                                const SizedBox(height: 6, width: 0),
-                                Text(
-                                  "Revisa que tu GPS este activo y brindanos permisos",
-                                  textAlign: TextAlign.center,
-                                ),
-                                const SizedBox(height: 6, width: 0),
-                                ElevatedButton(
-                                  onPressed: () =>
-                                      context.read<ListCubit>().fetchItems(),
-                                  child: Text("Reintentar"),
-                                ),
-                              ],
-                            ),
-                          );
-                        if (state is ListLoadedState)
-                          ListWidget =
-                              Center(child: CircularProgressIndicator());
-                        else if (state is ListLoadedState) {
-                          ListWidget = Expanded(
-                            child: NotificationListener(
+                      BlocBuilder<ListCubit, ListState>(
+                        builder: (context, state) {
+                          if (state is ListErrorState)
+                            return Center(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text("Ocurrio un error"),
+                                  const SizedBox(height: 6, width: 0),
+                                  Text(
+                                    "Revisa que tu GPS este activo y brindanos permisos",
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 6, width: 0),
+                                  ElevatedButton(
+                                    onPressed: () =>
+                                        context.read<ListCubit>().fetchItems(),
+                                    child: Text("Reintentar"),
+                                  ),
+                                ],
+                              ),
+                            );
+                          if (state is ListLoadingState)
+                            ListWidget =
+                                Center(child: CircularProgressIndicator());
+                          else if (state is ListLoadedState) {
+                            ListWidget = NotificationListener(
                               onNotification: (not) {
                                 if (not is ScrollEndNotification)
                                   _resetDotAnimations();
@@ -113,8 +114,7 @@ class _ListPageState extends State<ListPage> {
                                     aspectRatio: 3 / 1,
                                     child: Container(
                                       decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
+                                          borderRadius: BorderRadius.circular(10),
                                           border:
                                               Border.all(color: Colors.white)),
                                       child: InkWell(
@@ -134,8 +134,8 @@ class _ListPageState extends State<ListPage> {
                                               clipBehavior: Clip.antiAlias,
                                               child: Image(
                                                   fit: BoxFit.cover,
-                                                  image:
-                                                      NetworkImage(item.foto)),
+                                                  image: NetworkImage(item.foto ??
+                                                      "https://picsum.photos/500/300/?Image=101")),
                                             ),
                                             Positioned(
                                                 bottom: 10,
@@ -145,9 +145,8 @@ class _ListPageState extends State<ListPage> {
                                                         .textTheme
                                                         .headline6
                                                         ?.copyWith(
-                                                            color:
-                                                                Colors.blueGrey[
-                                                                    200]))),
+                                                            color: Colors
+                                                                .blueGrey[200]))),
                                             Positioned(
                                                 width: 30,
                                                 height: 30,
@@ -156,14 +155,15 @@ class _ListPageState extends State<ListPage> {
                                                         List<int>>(
                                                     valueListenable:
                                                         _visibilityRange,
-                                                    builder: (_, snapshot,
-                                                            __) =>
+                                                    builder: (_, snapshot, __) =>
                                                         _ParkDotState(
                                                             _calculateStatus(
                                                                 item.estado!
-                                                                    .total,
+                                                                        .total ??
+                                                                    0,
                                                                 item.estado!
-                                                                    .libres),
+                                                                        .libres ??
+                                                                    0),
                                                             position,
                                                             snapshot)))
                                           ],
@@ -176,13 +176,13 @@ class _ListPageState extends State<ListPage> {
                                 separatorBuilder: (_, __) =>
                                     const SizedBox(width: 0, height: 10),
                               ),
-                            ),
-                          );
-                        }
-                        return ListWidget;
-                      },
-                    ),
-                  ],
+                            );
+                          }
+                          return ListWidget;
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

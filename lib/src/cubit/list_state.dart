@@ -19,6 +19,7 @@ class ListLoadingState extends ListState {
 
 class ListLoadedState extends ListState {
   final List<ObjectPark> items;
+  final int stamp = DateTime.now().millisecondsSinceEpoch;
   ListLoadedState(this.items);
 
   @override

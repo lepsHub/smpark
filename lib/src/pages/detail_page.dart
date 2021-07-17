@@ -48,7 +48,7 @@ class DetailPage extends StatelessWidget {
                                 clipBehavior: Clip.antiAlias,
                                 child: Image(
                                     fit: BoxFit.cover,
-                                    image: NetworkImage(_park.foto)),
+                                    image: NetworkImage(_park.foto??"https://picsum.photos/500/300/?Image=99")),
                               ),
                               Positioned(
                                   bottom: 10,
@@ -371,7 +371,7 @@ class DetailPage extends StatelessWidget {
                                   child: Image(
                                       fit: BoxFit.cover,
                                       image: NetworkImage(
-                                          _park.puntosInteres[position].foto)),
+                                          _park.puntosInteres[position].foto??"https://picsum.photos/500/300/?Image=100")),
                                 ),
                               );
                             },
