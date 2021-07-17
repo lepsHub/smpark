@@ -1,3 +1,14 @@
+class ObjectParkWrapper {
+  List<ObjectPark> items;
+
+  ObjectParkWrapper(this.items);
+
+  factory ObjectParkWrapper.fromJson(Map<String, dynamic> json) {
+    return ObjectParkWrapper(List<ObjectPark>.from(
+        json["data"]?.map((x) => ObjectPark.fromJson(x))));
+  }
+}
+
 class ObjectPark {
   int id;
   String latitud;
@@ -5,7 +16,7 @@ class ObjectPark {
   String nombre;
   Estado? estado;
   String direccion;
-  String foto;
+  String? foto;
   Tarifa? tarifa;
   Horario? horario;
   List<PuntosInteres> puntosInteres;
@@ -52,8 +63,8 @@ class ObjectPark {
 }
 
 class Estado {
-  int total;
-  int libres;
+  int? total;
+  int? libres;
 
   Estado(this.total, this.libres);
 
@@ -71,8 +82,8 @@ class Estado {
 }
 
 class Tarifa {
-  int tarifaHora;
-  int lavadoAutos;
+  int? tarifaHora;
+  int? lavadoAutos;
 
   Tarifa(this.tarifaHora, this.lavadoAutos);
 
@@ -90,8 +101,8 @@ class Tarifa {
 }
 
 class Horario {
-  String diaSemana;
-  String finSemana;
+  String? diaSemana;
+  String? finSemana;
 
   Horario(this.diaSemana, this.finSemana);
 
@@ -111,7 +122,7 @@ class Horario {
 class PuntosInteres {
   String nombre;
   String url;
-  String foto;
+  String? foto;
 
   PuntosInteres(this.nombre, this.url, this.foto);
 

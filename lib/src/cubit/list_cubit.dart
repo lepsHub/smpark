@@ -72,7 +72,7 @@ class ListCubit extends Cubit<ListState> {
     try {
       var objectParkItems = await ServiceServiceImpl(ServiceAPI())
           .findServiceByFilter(locationData.latitude!, locationData.longitude!);
-      emit(ListLoadedState(objectParkItems));
+      emit(ListLoadedState(objectParkItems.items));
     } catch (e) {
       emit(ListErrorState());
     }
