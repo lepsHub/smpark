@@ -30,6 +30,10 @@ class ListErrorState extends ListState {
   const ListErrorState();
 }
 
+class ListEmptyState extends ListState {
+  const ListEmptyState();
+}
+
 class AddressLoadedState extends ListState {
   final List<ObjectPark> items;
   AddressLoadedState(this.items);

@@ -15,7 +15,7 @@ class ServiceServiceImpl implements ServiceService {
   @override
   Future<ObjectParkWrapper> findServiceByFilter(
           double latitud, double longitude) =>
-  //    Future.value(ObjectParkWrapper.fromJson(jsonDecode(DUMMY_RESPONSE)));
+     //Future.value(ObjectParkWrapper.fromJson(jsonDecode(DUMMY_RESPONSE)));
   _api.consumeGet(
       ServiceConstants.SERVICE_BY_COLLAB_PATH + "$latitud/$longitude");
 }
@@ -33,7 +33,7 @@ String DUMMY_RESPONSE = '{' +
     '"dia_semana": null,' +
     '"fin_semana": null' +
     ' },' +
-    '"id": 1,' +
+    '"id": 1,' +  
     '"latitud": "-12.14809603",' +
     '"longitud": "-77.01725114",' +
     '"nombre": "Edificio LUM",' +

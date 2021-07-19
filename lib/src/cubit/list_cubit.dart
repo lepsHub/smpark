@@ -1,5 +1,3 @@
-import 'dart:html';
-import 'dart:math';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -72,7 +70,10 @@ class ListCubit extends Cubit<ListState> {
     try {
       var objectParkItems = await ServiceServiceImpl(ServiceAPI())
           .findServiceByFilter(locationData.latitude!, locationData.longitude!);
+          if(objectParkItems.items.isNotEmpty)
       emit(ListLoadedState(objectParkItems.items));
+        else
+      emit(ListEmptyState());
     } catch (e) {
       emit(ListErrorState());
     }

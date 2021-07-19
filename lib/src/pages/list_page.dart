@@ -99,6 +99,17 @@ class _ListPageState extends State<ListPage> {
                           if (state is ListLoadingState)
                             ListWidget =
                                 Center(child: CircularProgressIndicator());
+                          else if(state is ListEmptyState) {
+                            ListWidget =
+                                Center(child: Column(children: [
+                                  Text('No hay estacionamientos'),
+                                  ElevatedButton(
+                                    onPressed: () =>
+                                        context.read<ListCubit>().fetchItems(),
+                                    child: Text("Reintentar"),
+                                  ),
+                                ],));
+                          }
                           else if (state is ListLoadedState) {
                             ListWidget = NotificationListener(
                               onNotification: (not) {
@@ -195,14 +206,14 @@ class _ListPageState extends State<ListPage> {
   _resetDotAnimations() {}
 
   StatusState _calculateStatus(int total, int free) {
-    if (free == total)
+    if (total - free == 0)
       return StatusState.FULL;
     else if (free >= total * .66)
-      return StatusState.ALMOST;
+      return StatusState.FREE;
     else if (free >= total * .33)
       return StatusState.PARTIAL;
     else
-      return StatusState.FREE;
+      return StatusState.ALMOST;
   }
 }
 

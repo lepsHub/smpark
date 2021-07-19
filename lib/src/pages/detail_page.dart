@@ -51,9 +51,19 @@ class DetailPage extends StatelessWidget {
                                     image: NetworkImage(_park.foto??"https://picsum.photos/500/300/?Image=99")),
                               ),
                               Positioned(
+                                child: Text('Estacionamientos libres : ${_park.estado?.libres ?? 0}',
+                                style: Theme.of(context)
+                                          .textTheme
+                                          .headline6
+                                          ?.copyWith(
+                                              color: Colors.white)),
+                                right: 10,
+                                top: 10,
+                              ),
+                              Positioned(
                                   bottom: 10,
                                   left: 10,
-                                  child: Text(_park.nombre,
+                                  child: Text(_park.direccion,
                                       style: Theme.of(context)
                                           .textTheme
                                           .headline6
@@ -188,7 +198,7 @@ class DetailPage extends StatelessWidget {
                                                 Padding(
                                                   padding: const EdgeInsets.all(
                                                       16.0),
-                                                  child: Text("S/ 5 por hora"),
+                                                  child: Text( _park.tarifa?.tarifaHora != null ?"S/ ${_park.tarifa?.tarifaHora} por hora" :"-"),
                                                 ),
                                                 Positioned(
                                                     width: 200,
@@ -218,8 +228,7 @@ class DetailPage extends StatelessWidget {
                                                 Padding(
                                                   padding:
                                                       const EdgeInsets.all(8.0),
-                                                  child: Text(
-                                                      "Lavado de autos\nS/ 6 soles",
+                                                  child: Text(_park.tarifa?.tarifaHora != null ?"Lavado de autos\nS/ ${_park.tarifa?.lavadoAutos} soles" :"-",
                                                       textAlign:
                                                           TextAlign.center),
                                                 ),
@@ -258,7 +267,7 @@ class DetailPage extends StatelessWidget {
                                                   padding:
                                                       const EdgeInsets.all(8.0),
                                                   child: Text(
-                                                    "L - V\n10:00 a.m. - 10:00 p.m.",
+                                                    "L - V\n ${_park.horario?.diaSemana ?? '-'}",
                                                     textAlign: TextAlign.center,
                                                   ),
                                                 ),
@@ -284,7 +293,7 @@ class DetailPage extends StatelessWidget {
                                                   padding:
                                                       const EdgeInsets.all(8.0),
                                                   child: Text(
-                                                      "S - D\n9:00 a.m. - 11:30 p.m.",
+                                                      "S - D\n${_park.horario?.finSemana ?? '-'}",
                                                       textAlign:
                                                           TextAlign.center),
                                                 ),
@@ -352,7 +361,7 @@ class DetailPage extends StatelessWidget {
                             ],
                           ),
                         ),
-                        Container(
+                        if (_park.puntosInteres.isNotEmpty)Container(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           color: Theme.of(context).scaffoldBackgroundColor,
                           child: GridView.builder(
@@ -377,7 +386,13 @@ class DetailPage extends StatelessWidget {
                             },
                             itemCount: _park.puntosInteres.length,
                           ),
-                        ),
+                        )
+                        else Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          color: Theme.of(context).scaffoldBackgroundColor,
+                          child:Column(children: [
+                                  Text('No hay puntos de interes registrados')
+                                ],)),
                         Container(
                           height: 20,
                           decoration: BoxDecoration(
