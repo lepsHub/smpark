@@ -20,7 +20,7 @@ class ServiceAPI {
       print("Request => ${uri.toString()};");
       final response = await get(uri, headers: ServiceUtil.createHeaders(""));
       print("Response => Code: ${uri.toString()}; ${response.statusCode}");
-      return ServiceUtil.returnResponse(response);
+      return ServiceUtil.returnResponse<T>(response);
     } catch (e) {
       print("An error has occurred ${e.runtimeType} -> ${e.toString()}");
       throw e;

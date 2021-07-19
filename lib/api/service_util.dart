@@ -7,8 +7,8 @@ class ServiceUtil {
     switch (response.statusCode) {
       case 200:
         var responseJson = json.decode(response.body);
-        if (T == ObjectPark)
-          return ObjectPark.fromJson(responseJson["data"]) as T;
+        if (T == ObjectParkWrapper)
+          return ObjectParkWrapper.fromJson(responseJson) as T;
 
         throw Exception(response.request?.url.toString() ?? EMPTY_STRING);
       default:
