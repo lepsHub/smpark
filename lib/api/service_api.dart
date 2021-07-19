@@ -2,12 +2,10 @@ import 'dart:convert';
 
 import 'package:http/http.dart';
 import 'package:smpark/src/providers/list_provider.dart';
-
 part 'package:smpark/api/service_util.dart';
 
 class ServiceConstants {
-  static const String BASE_URL = "localhost:8080";
-
+  static const String BASE_URL = "10.0.2.2:8080";
   static const String SERVICE_BY_COLLAB_PATH = "api/estacionamientos/";
 }
 
