@@ -32,7 +32,9 @@ class _ListPageState extends State<ListPage> {
     Widget ListWidget = Center(child: CircularProgressIndicator());
 
     return BlocProvider(
-      create: (context) => ListCubit(ServiceServiceImpl(ServiceAPI()), new Location())..fetchItems(),
+      create: (context) =>
+          ListCubit(ServiceServiceImpl(ServiceAPI()), new Location())
+            ..fetchItems(),
       child: Scaffold(
         body: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -40,22 +42,25 @@ class _ListPageState extends State<ListPage> {
             child: Builder(builder: (context) {
               return Column(
                 children: [
-                  Row(
-                    children: [
-                      Icon(CupertinoIcons.location_solid, size: 30),
-                      Expanded(
-                        child: TextField(
-                          onChanged: (val) {
-                            if (val.length > 4)
-                              context.read<ListCubit>().searchAddress(val);
-                          },
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Buscar dirección',
+                  Visibility(
+                    child: Row(
+                      children: [
+                        Icon(CupertinoIcons.location_solid, size: 30),
+                        Expanded(
+                          child: TextField(
+                            onChanged: (val) {
+                              if (val.length > 4)
+                                context.read<ListCubit>().searchAddress(val);
+                            },
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(),
+                              labelText: 'Buscar dirección',
+                            ),
                           ),
-                        ),
-                      )
-                    ],
+                        )
+                      ],
+                    ),
+                    visible: false,
                   ),
                   const SizedBox(width: 0, height: 10),
                   Expanded(
