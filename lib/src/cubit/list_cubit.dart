@@ -1,19 +1,19 @@
-import 'dart:math';
-
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:location/location.dart';
 import 'package:meta/meta.dart';
 import 'package:smpark/api/service/service_service.dart';
-import 'package:smpark/api/service_api.dart';
 import 'package:smpark/src/providers/list_provider.dart';
 
 part 'list_state.dart';
 
 class ListCubit extends Cubit<ListState> {
-  ListCubit() : super(ListInitial());
+  final ServiceService service;
+  final Location location;
+  ListCubit(this.service, this.location) : super(ListInitial());
 
   Future<void> fetchItems() async {
+    /*
     List<ObjectPark> objectParkItems = List.generate(10, (index) {
       return ObjectPark(
         index,
@@ -37,8 +37,49 @@ class ListCubit extends Cubit<ListState> {
     emit(ListLoadingState());
 
     await Future.delayed(const Duration(seconds: 2));
+    */
 
-/*
+
+    bool _serviceEnabled;
+    PermissionStatus _permissionGranted;
+
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
+        emit(ListErrorState());
+        return;
+      }
+    }
+
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted != PermissionStatus.granted) {
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        emit(ListErrorState());
+        return;
+      }
+    }
+
+    var locationData = await location.getLocation();
+    if (locationData.latitude == null || locationData.longitude == null) {
+      emit(ListErrorState());
+      return;
+    }
+
+    try {
+      var objectParkItems = await service.findServiceByFilter(
+          locationData.latitude!, locationData.longitude!);
+      if (objectParkItems.items.isNotEmpty)
+        emit(ListLoadedState(objectParkItems.items));
+      else
+        emit(ListEmptyState());
+    } catch (e) {
+      emit(ListErrorState());
+    }
+  }
+
+  Future<void> searchAddress(String address) async {
     Location location = new Location();
 
     bool _serviceEnabled;
@@ -67,18 +108,10 @@ class ListCubit extends Cubit<ListState> {
       emit(ListErrorState());
       return;
     }
-*/
-    try {
-      //var objectParkItems = await ServiceServiceImpl(ServiceAPI())
-      //  .findServiceByFilter(locationData.latitude!, locationData.longitude!);
-      if (objectParkItems.isNotEmpty)
-        emit(ListLoadedState(objectParkItems));
-      else
-        emit(ListEmptyState());
-    } catch (e) {
-      emit(ListErrorState());
-    }
-  }
 
-  Future<void> searchAddress(String address) async {}
+    var objectParkItems = await service.findCordsByDesc(
+        address, locationData.latitude!, locationData.longitude!);
+
+    print(objectParkItems.status);
+  }
 }

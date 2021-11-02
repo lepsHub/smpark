@@ -19,7 +19,8 @@ class ServiceUtil {
   static Map<String, String> createHeaders(String authToken) {
     return {
       "Content-Type": "application/json; charset=UTF-8",
-      "authentication": "Bearer $authToken"
+      "authentication": "Bearer $authToken",
+      "Access-Control-Allow-Origin": "*"
     };
   }
 }

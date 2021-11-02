@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:location/location.dart';
+import 'package:smpark/api/service/service_service.dart';
+import 'package:smpark/api/service_api.dart';
 import 'package:smpark/src/cubit/list_cubit.dart';
 import 'package:smpark/src/pages/detail_page.dart';
 import 'package:smpark/src/providers/list_provider.dart';
@@ -29,174 +32,185 @@ class _ListPageState extends State<ListPage> {
     Widget ListWidget = Center(child: CircularProgressIndicator());
 
     return BlocProvider(
-      create: (context) => ListCubit()..fetchItems(),
+      create: (context) => ListCubit(ServiceServiceImpl(ServiceAPI()), new Location())..fetchItems(),
       child: Scaffold(
         body: Padding(
           padding: const EdgeInsets.all(8.0),
           child: SafeArea(
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Icon(CupertinoIcons.location_solid, size: 30),
-                    Expanded(
-                      child: TextField(
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'Buscar dirección',
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-                const SizedBox(width: 0, height: 10),
-                Expanded(
-                  child: Stack(
-                    fit: StackFit.expand,
+            child: Builder(builder: (context) {
+              return Column(
+                children: [
+                  Row(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 30),
-                        child: BlocBuilder<ListCubit, ListState>(
-                          builder: (context, state) {
-                            if (state is AddressLoadedState)
-                              addressAutoCompleteWidget = ListView.builder(
-                                itemBuilder: (_, position) {
-                                  return ListTile(
-                                    title: Text("data"),
-                                  );
-                                },
-                                itemCount: state.hashCode,
-                              );
-                            else if (state is ListLoadedState)
-                              addressAutoCompleteWidget =
-                                  SizedBox(width: 0, height: 0);
-                            return addressAutoCompleteWidget;
+                      Icon(CupertinoIcons.location_solid, size: 30),
+                      Expanded(
+                        child: TextField(
+                          onChanged: (val) {
+                            if (val.length > 4)
+                              context.read<ListCubit>().searchAddress(val);
                           },
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Buscar dirección',
+                          ),
                         ),
-                      ),
-                      BlocBuilder<ListCubit, ListState>(
-                        builder: (context, state) {
-                          if (state is ListErrorState)
-                            return Center(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
+                      )
+                    ],
+                  ),
+                  const SizedBox(width: 0, height: 10),
+                  Expanded(
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 30),
+                          child: BlocBuilder<ListCubit, ListState>(
+                            builder: (context, state) {
+                              if (state is AddressLoadedState)
+                                addressAutoCompleteWidget = ListView.builder(
+                                  itemBuilder: (_, position) {
+                                    return ListTile(
+                                      title: Text("data"),
+                                    );
+                                  },
+                                  itemCount: state.hashCode,
+                                );
+                              else if (state is ListLoadedState)
+                                addressAutoCompleteWidget =
+                                    SizedBox(width: 0, height: 0);
+                              return addressAutoCompleteWidget;
+                            },
+                          ),
+                        ),
+                        BlocBuilder<ListCubit, ListState>(
+                          builder: (context, state) {
+                            if (state is ListErrorState)
+                              return Center(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text("Ocurrio un error"),
+                                    const SizedBox(height: 6, width: 0),
+                                    Text(
+                                      "Revisa que tu GPS este activo y brindanos permisos",
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    const SizedBox(height: 6, width: 0),
+                                    ElevatedButton(
+                                      onPressed: () => context
+                                          .read<ListCubit>()
+                                          .fetchItems(),
+                                      child: Text("Reintentar"),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            if (state is ListLoadingState)
+                              ListWidget =
+                                  Center(child: CircularProgressIndicator());
+                            else if (state is ListEmptyState) {
+                              ListWidget = Center(
+                                  child: Column(
                                 children: [
-                                  Text("Ocurrio un error"),
-                                  const SizedBox(height: 6, width: 0),
-                                  Text(
-                                    "Revisa que tu GPS este activo y brindanos permisos",
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  const SizedBox(height: 6, width: 0),
-                                  ElevatedButton(
-                                    onPressed: () =>
-                                        context.read<ListCubit>().fetchItems(),
-                                    child: Text("Reintentar"),
-                                  ),
-                                ],
-                              ),
-                            );
-                          if (state is ListLoadingState)
-                            ListWidget =
-                                Center(child: CircularProgressIndicator());
-                          else if(state is ListEmptyState) {
-                            ListWidget =
-                                Center(child: Column(children: [
                                   Text('No hay estacionamientos'),
                                   ElevatedButton(
                                     onPressed: () =>
                                         context.read<ListCubit>().fetchItems(),
                                     child: Text("Reintentar"),
                                   ),
-                                ],));
-                          }
-                          else if (state is ListLoadedState) {
-                            ListWidget = NotificationListener(
-                              onNotification: (not) {
-                                if (not is ScrollEndNotification)
-                                  _resetDotAnimations();
-                                return true;
-                              },
-                              child: ListView.separated(
-                                controller: _scrollController,
-                                itemBuilder: (_, position) {
-                                  ObjectPark item = state.items[position];
-                                  return AspectRatio(
-                                    aspectRatio: 3 / 1,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(10),
-                                          border:
-                                              Border.all(color: Colors.white)),
-                                      child: InkWell(
-                                        onTap: () => Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (_) =>
-                                                    DetailPage(item))),
-                                        child: Stack(
-                                          alignment: Alignment.centerRight,
-                                          clipBehavior: Clip.antiAlias,
-                                          fit: StackFit.expand,
-                                          children: [
-                                            ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              clipBehavior: Clip.antiAlias,
-                                              child: Image(
-                                                  fit: BoxFit.cover,
-                                                  image: NetworkImage(item.foto ??
-                                                      "https://picsum.photos/500/300/?Image=101")),
-                                            ),
-                                            Positioned(
-                                                bottom: 10,
-                                                left: 10,
-                                                child: Text(item.nombre,
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .headline6
-                                                        ?.copyWith(
-                                                            color: Colors
-                                                                .blueGrey[200]))),
-                                            Positioned(
-                                                width: 30,
-                                                height: 30,
-                                                right: 15,
-                                                child: ValueListenableBuilder<
-                                                        List<int>>(
-                                                    valueListenable:
-                                                        _visibilityRange,
-                                                    builder: (_, snapshot, __) =>
-                                                        _ParkDotState(
-                                                            _calculateStatus(
-                                                                item.estado!
-                                                                        .total ??
-                                                                    0,
-                                                                item.estado!
-                                                                        .libres ??
-                                                                    0),
-                                                            position,
-                                                            snapshot)))
-                                          ],
+                                ],
+                              ));
+                            } else if (state is ListLoadedState) {
+                              ListWidget = NotificationListener(
+                                onNotification: (not) {
+                                  if (not is ScrollEndNotification)
+                                    _resetDotAnimations();
+                                  return true;
+                                },
+                                child: ListView.separated(
+                                  controller: _scrollController,
+                                  itemBuilder: (_, position) {
+                                    ObjectPark item = state.items[position];
+                                    return AspectRatio(
+                                      aspectRatio: 3 / 1,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            border: Border.all(
+                                                color: Colors.white)),
+                                        child: InkWell(
+                                          onTap: () => Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (_) =>
+                                                      DetailPage(item))),
+                                          child: Stack(
+                                            alignment: Alignment.centerRight,
+                                            clipBehavior: Clip.antiAlias,
+                                            fit: StackFit.expand,
+                                            children: [
+                                              ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                clipBehavior: Clip.antiAlias,
+                                                child: Image(
+                                                    fit: BoxFit.cover,
+                                                    image: NetworkImage(item
+                                                            .foto ??
+                                                        "https://picsum.photos/500/300/?Image=101")),
+                                              ),
+                                              Positioned(
+                                                  bottom: 10,
+                                                  left: 10,
+                                                  child: Text(item.nombre,
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .headline6
+                                                          ?.copyWith(
+                                                              color: Colors
+                                                                      .blueGrey[
+                                                                  200]))),
+                                              Positioned(
+                                                  width: 30,
+                                                  height: 30,
+                                                  right: 15,
+                                                  child: ValueListenableBuilder<
+                                                          List<int>>(
+                                                      valueListenable:
+                                                          _visibilityRange,
+                                                      builder: (_, snapshot, __) =>
+                                                          _ParkDotState(
+                                                              _calculateStatus(
+                                                                  item.estado!
+                                                                          .total ??
+                                                                      0,
+                                                                  item.estado!
+                                                                          .libres ??
+                                                                      0),
+                                                              position,
+                                                              snapshot)))
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  );
-                                },
-                                itemCount: state.items.length,
-                                separatorBuilder: (_, __) =>
-                                    const SizedBox(width: 0, height: 10),
-                              ),
-                            );
-                          }
-                          return ListWidget;
-                        },
-                      ),
-                    ],
+                                    );
+                                  },
+                                  itemCount: state.items.length,
+                                  separatorBuilder: (_, __) =>
+                                      const SizedBox(width: 0, height: 10),
+                                ),
+                              );
+                            }
+                            return ListWidget;
+                          },
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              );
+            }),
           ),
         ),
       ),

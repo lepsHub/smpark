@@ -12,6 +12,19 @@ class ServiceConstants {
 class ServiceAPI {
   const ServiceAPI();
 
+  Future<T> consumeGetPure<T>(String base, String url, Map<String, dynamic> params) async {
+    try {
+      Uri uri = Uri.https(base, url, params);
+      print("Request => ${uri.toString()};");
+      final response = await get(uri, headers: ServiceUtil.createHeaders(""));
+      print("Response => Code: ${uri.toString()}; ${response.statusCode}");
+      return ServiceUtil.returnResponse<T>(response);
+    } catch (e) {
+      print("An error has occurred ${e.runtimeType} -> ${e.toString()}");
+      throw e;
+    }
+  }
+
   Future<T> consumeGet<T>(String url) async {
     try {
       Uri uri = Uri.http(ServiceConstants.BASE_URL, url);
