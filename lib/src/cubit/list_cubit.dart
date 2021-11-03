@@ -15,6 +15,7 @@ class ListCubit extends Cubit<ListState> {
   ListCubit(this.service, this.location) : super(ListInitial());
 
   Future<void> fetchItems() async {
+    /*
     List<ObjectPark> objectParkItems = List.generate(10, (index) {
       return ObjectPark(
         index,
@@ -38,8 +39,8 @@ class ListCubit extends Cubit<ListState> {
     emit(ListLoadingState());
 
     await Future.delayed(const Duration(seconds: 2));
+    */
 
-/*
     bool _serviceEnabled;
     PermissionStatus _permissionGranted;
 
@@ -66,16 +67,15 @@ class ListCubit extends Cubit<ListState> {
       emit(ListErrorState());
       return;
     }
-    */
-
+    
     try {
-      //var objectParkItems = await service.findServiceByFilter(
-      //    locationData.latitude!, locationData.longitude!);
-      // if (objectParkItems.items.isNotEmpty)
-      //  emit(ListLoadedState(objectParkItems.items));
-        emit(ListLoadedState(objectParkItems));
-      //else
-      //  emit(ListEmptyState());
+      var objectParkItems = await service.findServiceByFilter(
+          locationData.latitude!, locationData.longitude!);
+       if (objectParkItems.items.isNotEmpty)
+        emit(ListLoadedState(objectParkItems.items));
+      //  emit(ListLoadedState(objectParkItems));
+      else
+        emit(ListEmptyState());
     } catch (e) {
       emit(ListErrorState());
     }

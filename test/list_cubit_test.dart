@@ -31,7 +31,7 @@ void main() {
   late MockServiceService mockService;
   late MockLocation mockLocation;
 
-  group('smpark test', () {
+  group('smpark tests', () {
     setUp(() {
       mockService = MockServiceService();
       mockLocation = MockLocation();
@@ -122,6 +122,8 @@ void main() {
         verify: (_) {
           verify(mockLocation.serviceEnabled()).called(1);
           verify(mockLocation.requestService()).called(1);
+          verifyNever(mockLocation.getLocation());
+          verifyNever(mockService.findServiceByFilter(any, any));
         });
 
     blocTest<ListCubit, ListState>(
