@@ -2,10 +2,13 @@ import 'dart:convert';
 
 import 'package:smpark/api/service_api.dart';
 import 'package:smpark/src/providers/list_provider.dart';
+import 'package:smpark/src/providers/search_provider.dart';
 
 abstract class ServiceService {
   Future<ObjectParkWrapper> findServiceByFilter(
       double latitud, double longitude);
+
+  Future<SearchResultWrapper> findAddressGeoCode(String address);
 }
 
 class ServiceServiceImpl implements ServiceService {
@@ -15,9 +18,14 @@ class ServiceServiceImpl implements ServiceService {
   @override
   Future<ObjectParkWrapper> findServiceByFilter(
           double latitud, double longitude) =>
-  //    Future.value(ObjectParkWrapper.fromJson(jsonDecode(DUMMY_RESPONSE)));
-  _api.consumeGet(
-      ServiceConstants.SERVICE_BY_COLLAB_PATH + "$latitud/$longitude");
+      //    Future.value(ObjectParkWrapper.fromJson(jsonDecode(DUMMY_RESPONSE)));
+      _api.consumeGet(
+          ServiceConstants.SERVICE_BY_COLLAB_PATH + "$latitud/$longitude");
+
+  @override
+  Future<SearchResultWrapper> findAddressGeoCode(String address) =>
+      _api.consumeGet(
+          ServiceConstants.SEARCH_ADDRESS + address.replaceAll(" ", "+"));
 }
 
 String DUMMY_RESPONSE = '{' +

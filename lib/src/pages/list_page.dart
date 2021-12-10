@@ -39,14 +39,18 @@ class _ListPageState extends State<ListPage> {
                 Row(
                   children: [
                     Icon(CupertinoIcons.location_solid, size: 30),
-                    Expanded(
-                      child: TextField(
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'Buscar dirección',
+                    Builder(builder: (context) {
+                      return Expanded(
+                        child: TextField(
+                          onChanged: (newVal) =>
+                              context.read<ListCubit>().searchAddress(newVal),
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Buscar dirección',
+                          ),
                         ),
-                      ),
-                    )
+                      );
+                    })
                   ],
                 ),
                 const SizedBox(width: 0, height: 10),
@@ -58,11 +62,14 @@ class _ListPageState extends State<ListPage> {
                         padding: const EdgeInsets.only(left: 30),
                         child: BlocBuilder<ListCubit, ListState>(
                           builder: (context, state) {
-                            if (state is AddressLoadedState)
+                            if (state is AddressesLoadedState)
                               addressAutoCompleteWidget = ListView.builder(
                                 itemBuilder: (_, position) {
                                   return ListTile(
-                                    title: Text("data"),
+                                    title: Text(
+                                        state.items[position].formattedAddress),
+                                    onTap: () =>
+                                        context.read<ListCubit>().fetchItems(),
                                   );
                                 },
                                 itemCount: state.hashCode,
@@ -114,7 +121,8 @@ class _ListPageState extends State<ListPage> {
                                     aspectRatio: 3 / 1,
                                     child: Container(
                                       decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(10),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
                                           border:
                                               Border.all(color: Colors.white)),
                                       child: InkWell(
@@ -134,7 +142,8 @@ class _ListPageState extends State<ListPage> {
                                               clipBehavior: Clip.antiAlias,
                                               child: Image(
                                                   fit: BoxFit.cover,
-                                                  image: NetworkImage(item.foto ??
+                                                  image: NetworkImage(item
+                                                          .foto ??
                                                       "https://picsum.photos/500/300/?Image=101")),
                                             ),
                                             Positioned(
@@ -145,8 +154,9 @@ class _ListPageState extends State<ListPage> {
                                                         .textTheme
                                                         .headline6
                                                         ?.copyWith(
-                                                            color: Colors
-                                                                .blueGrey[200]))),
+                                                            color:
+                                                                Colors.blueGrey[
+                                                                    200]))),
                                             Positioned(
                                                 width: 30,
                                                 height: 30,
@@ -155,7 +165,8 @@ class _ListPageState extends State<ListPage> {
                                                         List<int>>(
                                                     valueListenable:
                                                         _visibilityRange,
-                                                    builder: (_, snapshot, __) =>
+                                                    builder: (_, snapshot,
+                                                            __) =>
                                                         _ParkDotState(
                                                             _calculateStatus(
                                                                 item.estado!

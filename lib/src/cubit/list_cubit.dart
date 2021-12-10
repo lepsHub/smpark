@@ -8,6 +8,7 @@ import 'package:meta/meta.dart';
 import 'package:smpark/api/service/service_service.dart';
 import 'package:smpark/api/service_api.dart';
 import 'package:smpark/src/providers/list_provider.dart';
+import 'package:smpark/src/providers/search_provider.dart';
 
 part 'list_state.dart';
 
@@ -69,14 +70,22 @@ class ListCubit extends Cubit<ListState> {
       return;
     }
 
+    fetchAddress(locationData.latitude!, locationData.longitude!);
+  }
+
+  Future<void> fetchAddress(double lat, double long) async {
     try {
-      var objectParkItems = await ServiceServiceImpl(ServiceAPI())
-          .findServiceByFilter(locationData.latitude!, locationData.longitude!);
+      var objectParkItems =
+          await ServiceServiceImpl(ServiceAPI()).findServiceByFilter(lat, long);
       emit(ListLoadedState(objectParkItems.items));
     } catch (e) {
       emit(ListErrorState());
     }
   }
 
-  Future<void> searchAddress(String address) async {}
+  Future<void> searchAddress(String address) async {
+    var objectParkItems =
+        await ServiceServiceImpl(ServiceAPI()).findAddressGeoCode(address);
+    emit(AddressesLoadedState(objectParkItems.results));
+  }
 }
