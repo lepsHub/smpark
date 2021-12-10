@@ -48,12 +48,34 @@ class DetailPage extends StatelessWidget {
                                 clipBehavior: Clip.antiAlias,
                                 child: Image(
                                     fit: BoxFit.cover,
-                                    image: NetworkImage(_park.foto??"https://picsum.photos/500/300/?Image=99")),
+                                    image: NetworkImage(_park.foto ??
+                                        "https://picsum.photos/500/300/?Image=99")),
+                              ),
+                              Positioned(
+                                child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                          'Estacionamientos libres : ${_park.estado?.libres ?? 0}',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headline6
+                                              ?.copyWith(color: Colors.white)),
+                                      IconButton(
+                                          onPressed: () => showCupertinoDialog(
+                                              context: context,
+                                              builder: (_) =>
+                                                  AvailabilityPopUp()),
+                                          icon:
+                                              Icon(CupertinoIcons.info_circle))
+                                    ]),
+                                right: 10,
+                                top: 10,
                               ),
                               Positioned(
                                   bottom: 10,
                                   left: 10,
-                                  child: Text(_park.nombre,
+                                  child: Text(_park.direccion,
                                       style: Theme.of(context)
                                           .textTheme
                                           .headline6
@@ -188,7 +210,11 @@ class DetailPage extends StatelessWidget {
                                                 Padding(
                                                   padding: const EdgeInsets.all(
                                                       16.0),
-                                                  child: Text("S/ 5 por hora"),
+                                                  child: Text(_park.tarifa
+                                                              ?.tarifaHora !=
+                                                          null
+                                                      ? "S/ ${_park.tarifa?.tarifaHora} por hora"
+                                                      : "-"),
                                                 ),
                                                 Positioned(
                                                     width: 200,
@@ -219,7 +245,10 @@ class DetailPage extends StatelessWidget {
                                                   padding:
                                                       const EdgeInsets.all(8.0),
                                                   child: Text(
-                                                      "Lavado de autos\nS/ 6 soles",
+                                                      _park.tarifa?.tarifaHora !=
+                                                              null
+                                                          ? "Lavado de autos\nS/ ${_park.tarifa?.lavadoAutos} soles"
+                                                          : "-",
                                                       textAlign:
                                                           TextAlign.center),
                                                 ),
@@ -258,7 +287,7 @@ class DetailPage extends StatelessWidget {
                                                   padding:
                                                       const EdgeInsets.all(8.0),
                                                   child: Text(
-                                                    "L - V\n10:00 a.m. - 10:00 p.m.",
+                                                    "L - V\n ${_park.horario?.diaSemana ?? '-'}",
                                                     textAlign: TextAlign.center,
                                                   ),
                                                 ),
@@ -284,7 +313,7 @@ class DetailPage extends StatelessWidget {
                                                   padding:
                                                       const EdgeInsets.all(8.0),
                                                   child: Text(
-                                                      "S - D\n9:00 a.m. - 11:30 p.m.",
+                                                      "S - D\n${_park.horario?.finSemana ?? '-'}",
                                                       textAlign:
                                                           TextAlign.center),
                                                 ),
@@ -352,32 +381,44 @@ class DetailPage extends StatelessWidget {
                             ],
                           ),
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                          child: GridView.builder(
-                            shrinkWrap: true,
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2,
-                                    childAspectRatio: 2 / 1.5),
-                            itemBuilder: (_, position) {
-                              return Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 20, vertical: 10),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  clipBehavior: Clip.antiAlias,
-                                  child: Image(
-                                      fit: BoxFit.cover,
-                                      image: NetworkImage(
-                                          _park.puntosInteres[position].foto??"https://picsum.photos/500/300/?Image=100")),
-                                ),
-                              );
-                            },
-                            itemCount: _park.puntosInteres.length,
-                          ),
-                        ),
+                        if (_park.puntosInteres.isNotEmpty)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            color: Theme.of(context).scaffoldBackgroundColor,
+                            child: GridView.builder(
+                              shrinkWrap: true,
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      childAspectRatio: 2 / 1.5),
+                              itemBuilder: (_, position) {
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 10),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    clipBehavior: Clip.antiAlias,
+                                    child: Image(
+                                        fit: BoxFit.cover,
+                                        image: NetworkImage(_park
+                                                .puntosInteres[position].foto ??
+                                            "https://picsum.photos/500/300/?Image=100")),
+                                  ),
+                                );
+                              },
+                              itemCount: _park.puntosInteres.length,
+                            ),
+                          )
+                        else
+                          Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
+                              color: Theme.of(context).scaffoldBackgroundColor,
+                              child: Column(
+                                children: [
+                                  Text('No hay puntos de interes registrados')
+                                ],
+                              )),
                         Container(
                           height: 20,
                           decoration: BoxDecoration(
@@ -399,6 +440,98 @@ class DetailPage extends StatelessWidget {
           ),
         );
       }),
+    );
+  }
+}
+
+class AvailabilityPopUp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Card(
+        child: Stack(children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text("Leyenda: ", style: Theme.of(context).textTheme.subtitle1),
+                SizedBox(height: 10, width: 0),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                          border: Border.all(width: 2, color: Colors.white),
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                          color: Colors.green),
+                    ),
+                    SizedBox(width: 10, height: 0),
+                    Text("Alta disponibilidad de estacionamientos")
+                  ],
+                ),
+                SizedBox(height: 5, width: 0),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                          border: Border.all(width: 2, color: Colors.white),
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                          color: Colors.yellow),
+                    ),
+                    SizedBox(width: 10, height: 0),
+                    Text("Media disponibilidad de estacionamientos")
+                  ],
+                ),
+                SizedBox(height: 5, width: 0),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                          border: Border.all(width: 2, color: Colors.white),
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                          color: Colors.orange),
+                    ),
+                    SizedBox(width: 10, height: 0),
+                    Text("Baja disponibilidad de estacionamientos")
+                  ],
+                ),
+                SizedBox(height: 5, width: 0),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                          border: Border.all(width: 2, color: Colors.white),
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                          color: Colors.red),
+                    ),
+                    SizedBox(width: 10, height: 0),
+                    Text("Nula disponibilidad de estacionamientos")
+                  ],
+                )
+              ],
+            ),
+          ),
+          Positioned(
+            right: 2,
+            child: IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: Icon(CupertinoIcons.clear)),
+          )
+        ]),
+      ),
     );
   }
 }

@@ -82,8 +82,8 @@ class Estado {
 }
 
 class Tarifa {
-  int? tarifaHora;
-  int? lavadoAutos;
+  double? tarifaHora;
+  double? lavadoAutos;
 
   Tarifa(this.tarifaHora, this.lavadoAutos);
 

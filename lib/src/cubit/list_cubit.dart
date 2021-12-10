@@ -1,4 +1,3 @@
-import 'dart:html';
 import 'dart:math';
 
 import 'package:bloc/bloc.dart';
@@ -13,7 +12,9 @@ import 'package:smpark/src/providers/search_provider.dart';
 part 'list_state.dart';
 
 class ListCubit extends Cubit<ListState> {
-  ListCubit() : super(ListInitial());
+  final ServiceService service;
+  final Location location;
+  ListCubit(this.service, this.location) : super(ListInitial());
 
   Future<void> fetchItems() async {
     /*
@@ -36,12 +37,11 @@ class ListCubit extends Cubit<ListState> {
                 'https://picsum.photos/500/300/?Image=$index')),
       );
     });
-    await Future.delayed(const Duration(seconds: 2));
-    */
 
     emit(ListLoadingState());
 
-    Location location = new Location();
+    await Future.delayed(const Duration(seconds: 2));
+    */
 
     bool _serviceEnabled;
     PermissionStatus _permissionGranted;
@@ -73,11 +73,15 @@ class ListCubit extends Cubit<ListState> {
     fetchAddress(locationData.latitude!, locationData.longitude!);
   }
 
-  Future<void> fetchAddress(double lat, double long) async {
+  Future<void> fetchAddress(double lat, double long) async {    
     try {
-      var objectParkItems =
-          await ServiceServiceImpl(ServiceAPI()).findServiceByFilter(lat, long);
-      emit(ListLoadedState(objectParkItems.items));
+      var objectParkItems = await service.findServiceByFilter(
+          lat, long);
+       if (objectParkItems.items.isNotEmpty)
+        emit(ListLoadedState(objectParkItems.items));
+      //  emit(ListLoadedState(objectParkItems));
+      else
+        emit(ListEmptyState());
     } catch (e) {
       emit(ListErrorState());
     }

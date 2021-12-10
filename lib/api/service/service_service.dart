@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:smpark/api/service_api.dart';
+import 'package:smpark/src/providers/GeoSearch.dart';
 import 'package:smpark/src/providers/list_provider.dart';
 import 'package:smpark/src/providers/search_provider.dart';
 
@@ -18,7 +19,6 @@ class ServiceServiceImpl implements ServiceService {
   @override
   Future<ObjectParkWrapper> findServiceByFilter(
           double latitud, double longitude) =>
-      //    Future.value(ObjectParkWrapper.fromJson(jsonDecode(DUMMY_RESPONSE)));
       _api.consumeGet(
           ServiceConstants.SERVICE_BY_COLLAB_PATH + "$latitud/$longitude");
 

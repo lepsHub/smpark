@@ -2,13 +2,12 @@ import 'dart:convert';
 
 import 'package:http/http.dart';
 import 'package:smpark/src/providers/list_provider.dart';
-
 part 'package:smpark/api/service_util.dart';
 
 class ServiceConstants {
-  static const String BASE_URL = "localhost:8080";
   static const String SECONDARY_BASE_URL = "maps.googleapis.com";
 
+  static const String BASE_URL = "10.0.2.2:8080";
   static const String SERVICE_BY_COLLAB_PATH = "api/estacionamientos/";
   static const String SEARCH_ADDRESS = "api/buscar/";
 }
@@ -16,9 +15,9 @@ class ServiceConstants {
 class ServiceAPI {
   const ServiceAPI();
 
-  Future<T> consumeCustomGet<T>(String secondaryURL, String url) async {
+  Future<T> consumeGetPure<T>(String base, String url, Map<String, dynamic> params) async {
     try {
-      Uri uri = Uri.http(secondaryURL, url);
+      Uri uri = Uri.https(base, url, params);
       print("Request => ${uri.toString()};");
       final response = await get(uri, headers: ServiceUtil.createHeaders(""));
       print("Response => Code: ${uri.toString()}; ${response.statusCode}");

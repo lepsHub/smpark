@@ -38,9 +38,12 @@ class AddressesLoadedState extends ListState {
   final List<Results> items;
   final int stamp = DateTime.now().millisecondsSinceEpoch;
   AddressesLoadedState(this.items);
-
   @override
   List<Object?> get props => [items, stamp];
+}
+
+class ListEmptyState extends ListState {
+  const ListEmptyState();
 }
 
 class ListErrorState extends ListState {
