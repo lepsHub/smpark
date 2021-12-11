@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart';
 import 'package:smpark/src/providers/list_provider.dart';
+import 'package:smpark/src/providers/search_provider.dart';
 part 'package:smpark/api/service_util.dart';
 
 class ServiceConstants {
