@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,11 +20,13 @@ class ListPage extends StatefulWidget {
 class _ListPageState extends State<ListPage> {
   final ScrollController _scrollController = ScrollController();
   final ValueNotifier<List<int>> _visibilityRange = ValueNotifier([0, 1]);
+  Timer? _debounceField;
 
   @override
   void dispose() {
     _scrollController.dispose();
     _visibilityRange.dispose();
+    _debounceField?.cancel();
     super.dispose();
   }
 
@@ -48,8 +52,17 @@ class _ListPageState extends State<ListPage> {
                       Expanded(
                         child: TextField(
                           onChanged: (val) {
-                            if (val.length > 4)
-                              context.read<ListCubit>().searchAddress(val);
+                            if (val.length > 4) {
+                              if (_debounceField?.isActive ?? false)
+                                _debounceField?.cancel();
+                              _debounceField = Timer(
+                                  const Duration(milliseconds: 1200),
+                                  () => context
+                                      .read<ListCubit>()
+                                      .searchAddress(val));
+                            } else {
+                              _debounceField?.cancel();
+                            }
                           },
                           decoration: InputDecoration(
                             border: OutlineInputBorder(),
