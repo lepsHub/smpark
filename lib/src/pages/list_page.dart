@@ -201,7 +201,10 @@ class _ListPageState extends State<ListPage> {
                           },
                         ),
                         
-                        Container(
+                  BlocBuilder<ListCubit, ListState>(
+                            builder: (context, state) {
+                          if (state is AddressesLoadedState)
+                              addressAutoCompleteWidget =       Container(
                                         decoration: BoxDecoration(
                           color: Colors.blueGrey[500],
                                             borderRadius:
@@ -211,10 +214,9 @@ class _ListPageState extends State<ListPage> {
                           child: 
                         Padding(
                           padding: const EdgeInsets.only(left: 30),
-                          child: BlocBuilder<ListCubit, ListState>(
-                            builder: (context, state) {
-                              if (state is AddressesLoadedState)
-                                addressAutoCompleteWidget = ListView.builder(
+                          child: 
+                              
+                                ListView.builder(
                                   shrinkWrap: true,
                                   itemBuilder: (_, position) {
                                     var address = state.items[position];
@@ -223,15 +225,18 @@ class _ListPageState extends State<ListPage> {
                                       onTap: () => context.read<ListCubit>().fetchAddress(address.geometry.location.lat, address.geometry.location.lng),
                                     );
                                   },
-                                  itemCount: 10,
-                                );
-                              else if (state is ListLoadedState)
+                                  itemCount: state.items.length,
+                                )
+                              
+                            
+                          ),
+                        );
+                        else if (state is ListLoadedState)
                                 addressAutoCompleteWidget =
                                     SizedBox(width: 0, height: 0);
                               return addressAutoCompleteWidget;
-                            },
-                          ),
-                        ),)
+                              
+                              },)
                       ],
                     ),
                   ),
