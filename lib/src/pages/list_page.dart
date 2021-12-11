@@ -200,23 +200,30 @@ class _ListPageState extends State<ListPage> {
                             return ListWidget;
                           },
                         ),
+                        
+                        Container(
+                                        decoration: BoxDecoration(
+                          color: Colors.blueGrey[500],
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            border: Border.all(
+                                                color: Colors.white)),
+                          child: 
                         Padding(
                           padding: const EdgeInsets.only(left: 30),
                           child: BlocBuilder<ListCubit, ListState>(
                             builder: (context, state) {
                               if (state is AddressesLoadedState)
                                 addressAutoCompleteWidget = ListView.builder(
+                                  shrinkWrap: true,
                                   itemBuilder: (_, position) {
+                                    var address = state.items[position];
                                     return ListTile(
-                                      tileColor: Colors.blueGrey[900],
-                                      title: Text(state
-                                          .items[position].formattedAddress),
-                                      onTap: () => context
-                                          .read<ListCubit>()
-                                          .fetchItems(),
+                                      title: Text(address.formattedAddress),
+                                      onTap: () => context.read<ListCubit>().fetchAddress(address.geometry.location.lat, address.geometry.location.lng),
                                     );
                                   },
-                                  itemCount: state.items.length,
+                                  itemCount: 10,
                                 );
                               else if (state is ListLoadedState)
                                 addressAutoCompleteWidget =
@@ -224,7 +231,7 @@ class _ListPageState extends State<ListPage> {
                               return addressAutoCompleteWidget;
                             },
                           ),
-                        ),
+                        ),)
                       ],
                     ),
                   ),
