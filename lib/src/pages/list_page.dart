@@ -42,25 +42,22 @@ class _ListPageState extends State<ListPage> {
             child: Builder(builder: (context) {
               return Column(
                 children: [
-                  Visibility(
-                    child: Row(
-                      children: [
-                        Icon(CupertinoIcons.location_solid, size: 30),
-                        Expanded(
-                          child: TextField(
-                            onChanged: (val) {
-                              if (val.length > 4)
-                                context.read<ListCubit>().searchAddress(val);
-                            },
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(),
-                              labelText: 'Buscar dirección',
-                            ),
+                  Row(
+                    children: [
+                      Icon(CupertinoIcons.location_solid, size: 30),
+                      Expanded(
+                        child: TextField(
+                          onChanged: (val) {
+                            if (val.length > 4)
+                              context.read<ListCubit>().searchAddress(val);
+                          },
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Buscar dirección',
                           ),
-                        )
-                      ],
-                    ),
-                    visible: false,
+                        ),
+                      )
+                    ],
                   ),
                   const SizedBox(width: 0, height: 10),
                   Expanded(
@@ -71,16 +68,17 @@ class _ListPageState extends State<ListPage> {
                           padding: const EdgeInsets.only(left: 30),
                           child: BlocBuilder<ListCubit, ListState>(
                             builder: (context, state) {
-                            if (state is AddressesLoadedState)
-                              addressAutoCompleteWidget = ListView.builder(
-                                itemBuilder: (_, position) {
-                                  return ListTile(
-                                    title: Text(
-                                        state.items[position].formattedAddress),
-                                    onTap: () =>
-                                        context.read<ListCubit>().fetchItems(),
-                                  );
-                                },
+                              if (state is AddressesLoadedState)
+                                addressAutoCompleteWidget = ListView.builder(
+                                  itemBuilder: (_, position) {
+                                    return ListTile(
+                                      title: Text(state
+                                          .items[position].formattedAddress),
+                                      onTap: () => context
+                                          .read<ListCubit>()
+                                          .fetchItems(),
+                                    );
+                                  },
                                   itemCount: state.items.length,
                                 );
                               else if (state is ListLoadedState)
