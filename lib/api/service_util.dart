@@ -9,6 +9,8 @@ class ServiceUtil {
         var responseJson = json.decode(response.body);
         if (T == ObjectParkWrapper)
           return ObjectParkWrapper.fromJson(responseJson) as T;
+        else if (T == SearchResultWrapper)
+          return SearchResultWrapper.fromJson(responseJson) as T;
 
         throw Exception(response.request?.url.toString() ?? EMPTY_STRING);
       default:
