@@ -77,30 +77,6 @@ class _ListPageState extends State<ListPage> {
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 30),
-                          child: BlocBuilder<ListCubit, ListState>(
-                            builder: (context, state) {
-                              if (state is AddressesLoadedState)
-                                addressAutoCompleteWidget = ListView.builder(
-                                  itemBuilder: (_, position) {
-                                    return ListTile(
-                                      title: Text(state
-                                          .items[position].formattedAddress),
-                                      onTap: () => context
-                                          .read<ListCubit>()
-                                          .fetchItems(),
-                                    );
-                                  },
-                                  itemCount: state.items.length,
-                                );
-                              else if (state is ListLoadedState)
-                                addressAutoCompleteWidget =
-                                    SizedBox(width: 0, height: 0);
-                              return addressAutoCompleteWidget;
-                            },
-                          ),
-                        ),
                         BlocBuilder<ListCubit, ListState>(
                           builder: (context, state) {
                             if (state is ListErrorState)
@@ -223,6 +199,31 @@ class _ListPageState extends State<ListPage> {
                             }
                             return ListWidget;
                           },
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 30),
+                          child: BlocBuilder<ListCubit, ListState>(
+                            builder: (context, state) {
+                              if (state is AddressesLoadedState)
+                                addressAutoCompleteWidget = ListView.builder(
+                                  itemBuilder: (_, position) {
+                                    return ListTile(
+                                      tileColor: Colors.blueGrey[900],
+                                      title: Text(state
+                                          .items[position].formattedAddress),
+                                      onTap: () => context
+                                          .read<ListCubit>()
+                                          .fetchItems(),
+                                    );
+                                  },
+                                  itemCount: state.items.length,
+                                );
+                              else if (state is ListLoadedState)
+                                addressAutoCompleteWidget =
+                                    SizedBox(width: 0, height: 0);
+                              return addressAutoCompleteWidget;
+                            },
+                          ),
                         ),
                       ],
                     ),
