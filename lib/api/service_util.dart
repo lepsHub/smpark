@@ -3,7 +3,7 @@ part of 'service_api.dart';
 String EMPTY_STRING = "";
 
 class ServiceUtil {
-  static T returnResponse<T>(Response response) {
+  static T returnResponse<T>(Response response) { 
     switch (response.statusCode) {
       case 200:
         var responseJson = json.decode(response.body);
